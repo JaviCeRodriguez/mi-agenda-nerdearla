@@ -19,7 +19,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             Latinoamérica
           </p>
         </div>
-        <FilterBar />
+        <Suspense
+          fallback={<div className="text-center py-8">Cargando filtros...</div>}
+        >
+          <FilterBar />
+        </Suspense>
         <Suspense
           fallback={<div className="text-center py-8">Cargando charlas...</div>}
         >
