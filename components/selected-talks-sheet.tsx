@@ -37,9 +37,11 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
       <SheetContent className="w-full sm:max-w-md">
         <SheetHeader>
           <div className="flex items-center justify-between">
-            <SheetTitle>Mis Charlas Seleccionadas</SheetTitle>
+            <SheetTitle className="text-lg">
+              Mis Charlas Seleccionadas
+            </SheetTitle>
           </div>
-          <SheetDescription>
+          <SheetDescription className="text-sm">
             {isLoading
               ? "Cargando..."
               : savedTalks.length === 0
@@ -50,10 +52,10 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="h-[calc(100vh-120px)] mt-6">
+        <ScrollArea className="h-[calc(100vh-100px)] p-4">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                 <Clock className="w-8 h-8 text-muted-foreground animate-pulse" />
               </div>
               <p className="text-muted-foreground text-sm">
@@ -61,8 +63,8 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
               </p>
             </div>
           ) : savedTalks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                 <Clock className="w-8 h-8 text-muted-foreground" />
               </div>
               <p className="text-muted-foreground text-sm">
@@ -70,14 +72,14 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {savedTalks.map((talk) => (
                 <div
                   key={talk.id}
-                  className="border border-border rounded-lg p-4 space-y-3"
+                  className="border border-border rounded-lg p-5 space-y-4 bg-card hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         {talk.time_slot}
@@ -87,11 +89,14 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
                       <h4 className="font-medium text-sm leading-tight text-pretty">
                         {talk.title}
                       </h4>
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="secondary" className="text-xs">
+                      <div className="flex flex-wrap gap-2">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs px-2 py-1"
+                        >
                           {talk.track}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs px-2 py-1">
                           {talk.day}
                         </Badge>
                       </div>
@@ -100,14 +105,14 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeTalk(talk.id)}
-                      className="shrink-0 h-8 w-8 p-0"
+                      className="shrink-0 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-6 h-6">
+                  <div className="flex items-start gap-3 pt-2 border-t border-border/50">
+                    <Avatar className="w-7 h-7 shrink-0">
                       <AvatarImage
                         src="/placeholder-user.jpg"
                         alt={talk.speakers[0] || "Speaker"}
@@ -119,11 +124,11 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
                           .join("") || "S"}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="text-xs font-medium">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground">
                         {talk.speakers.join(", ")}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                         {talk.description
                           ? talk.description.length > 50
                             ? `${talk.description.substring(0, 50)}...`
