@@ -1,7 +1,6 @@
 "use client";
 
 import { Clock, MapPin, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  fetchSavedTalksFromUser,
-  removeSavedTalk,
-  type SavedTalkWithDetails,
-} from "@/lib/talks";
+import { useSavedTalks } from "@/contexts/saved-talks-context";
 
 type Props = {
   isOpen: boolean;
@@ -26,36 +21,12 @@ type Props = {
 };
 
 export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
-  const [savedTalks, setSavedTalks] = useState<SavedTalkWithDetails[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      loadSavedTalks();
-    }
-  }, [isOpen]);
-
-  const loadSavedTalks = async () => {
-    setLoading(true);
-    try {
-      const talks = await fetchSavedTalksFromUser();
-      setSavedTalks(talks);
-    } catch (error) {
-      console.error("Error loading saved talks:", error);
-      setSavedTalks([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { savedTalks, isLoading, unsaveTalk } = useSavedTalks();
 
   const removeTalk = async (talkId: string) => {
     try {
-      const success = await removeSavedTalk(talkId);
-
-      if (success) {
-        setSavedTalks((prev) => prev.filter((talk) => talk.id !== talkId));
-        onRefresh?.();
-      }
+      await unsaveTalk(talkId);
+      onRefresh?.();
     } catch (error) {
       console.error("Error removing talk:", error);
     }
@@ -69,7 +40,7 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
             <SheetTitle>Mis Charlas Seleccionadas</SheetTitle>
           </div>
           <SheetDescription>
-            {loading
+            {isLoading
               ? "Cargando..."
               : savedTalks.length === 0
               ? "No has seleccionado ninguna charla aún"
@@ -80,7 +51,7 @@ export function SelectedTalksSheet({ isOpen, onClose, onRefresh }: Props) {
         </SheetHeader>
 
         <ScrollArea className="h-[calc(100vh-120px)] mt-6">
-          {loading ? (
+          {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                 <Clock className="w-8 h-8 text-muted-foreground animate-pulse" />

@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TRACK_COLORS } from "@/lib/utils";
 import type { Talk } from "@/lib/types";
+import { useSavedTalks } from "@/contexts/saved-talks-context";
+import { useState } from "react";
 
 interface TalkCardProps {
   talk: Talk;
@@ -26,6 +28,32 @@ export function TalkCard({
   onToggle,
   hideToggle = false,
 }: TalkCardProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const { isTalkSaved, saveTalk, unsaveTalk } = useSavedTalks();
+
+  const isSaved = isTalkSaved(talk.id);
+
+  const handleSaveTalk = async () => {
+    setIsLoading(true);
+
+    try {
+      if (isSaved) {
+        await unsaveTalk(talk.id);
+      } else {
+        await saveTalk(talk.id);
+      }
+
+      // Call the parent onToggle if provided
+      if (onToggle) {
+        onToggle();
+      }
+    } catch (error) {
+      console.error("Error saving talk:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -70,12 +98,13 @@ export function TalkCard({
           </div>
           {!hideToggle && (
             <Button
-              variant={isSelected ? "default" : "ghost"}
+              variant={isSaved ? "default" : "ghost"}
               size="sm"
               className="shrink-0"
-              onClick={onToggle}
+              onClick={handleSaveTalk}
+              disabled={isLoading}
             >
-              {isSelected ? (
+              {isSaved ? (
                 <BookmarkCheck className="w-4 h-4" />
               ) : (
                 <Bookmark className="w-4 h-4" />
