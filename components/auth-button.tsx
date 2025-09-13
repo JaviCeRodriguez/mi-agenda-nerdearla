@@ -14,12 +14,10 @@ import { LogIn, LogOut, UserIcon, Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@/lib/types";
-import { SelectedTalksSheet } from "./selected-talks-sheet";
+import Link from "next/link";
 
 export function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
-  const [isSelectedTalksSheetOpen, setIsSelectedTalksSheetOpen] =
-    useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
@@ -147,9 +145,14 @@ export function AuthButton() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={() => setIsSelectedTalksSheetOpen(true)}>
-            <UserIcon className="h-4 w-4 mr-2" />
-            Mis Charlas
+          <DropdownMenuItem>
+            <Link
+              href={`/${user.id}/talks`}
+              className="flex items-center gap-2"
+            >
+              <UserIcon className="h-4 w-4 mr-2" />
+              Mis Charlas
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut}>
@@ -158,10 +161,6 @@ export function AuthButton() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <SelectedTalksSheet
-        isOpen={isSelectedTalksSheetOpen}
-        onClose={() => setIsSelectedTalksSheetOpen(false)}
-      />
     </>
   );
 }

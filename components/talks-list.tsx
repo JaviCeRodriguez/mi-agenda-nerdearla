@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { parseFilterParams } from "@/lib/url-params";
 import { filterTalks, convertSearchParamsToURLSearchParams } from "@/lib/utils";
+import { getSavedTalks } from "@/lib/actions";
 import type { Talk } from "@/lib/types";
 
 const fetchTalks = async () => {
@@ -20,6 +21,8 @@ interface TalksListProps {
 
 export async function TalksList({ searchParams }: TalksListProps) {
   const { talks } = await fetchTalks();
+  const savedTalks = await getSavedTalks();
+  const savedTalkIds = new Set(savedTalks.map((talk) => talk.id));
 
   const urlSearchParams = convertSearchParamsToURLSearchParams(searchParams);
   const { day, tracks } = parseFilterParams(urlSearchParams as any);
@@ -38,7 +41,11 @@ export async function TalksList({ searchParams }: TalksListProps) {
 
       <div className="grid gap-4 md:grid-cols-2">
         {filteredTalks.map((talk) => (
-          <TalkCard key={talk.id} talk={talk} />
+          <TalkCard
+            key={talk.id}
+            talk={talk}
+            isSaved={savedTalkIds.has(talk.id)}
+          />
         ))}
       </div>
 

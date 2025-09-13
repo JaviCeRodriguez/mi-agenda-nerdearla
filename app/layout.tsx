@@ -3,7 +3,6 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/toaster";
-import { SavedTalksProvider } from "@/contexts/saved-talks-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -80,11 +79,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <SavedTalksProvider>
-          {children}
-          <Analytics />
-          <Toaster />
-        </SavedTalksProvider>
+        {children}
+        <Analytics />
+        <Toaster />
       </body>
     </html>
   );

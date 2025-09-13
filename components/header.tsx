@@ -20,7 +20,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { SelectedTalksSheet } from "./selected-talks-sheet";
 
 interface HeaderProps {
   selectedCount?: number;
@@ -31,8 +30,6 @@ interface HeaderProps {
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isSelectedTalksSheetOpen, setIsSelectedTalksSheetOpen] =
-    useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
@@ -72,11 +69,6 @@ export function Header() {
   const signOut = async () => {
     await supabase.auth.signOut();
     router.refresh();
-    setMobileMenuOpen(false);
-  };
-
-  const openSelectedTalks = () => {
-    setIsSelectedTalksSheetOpen(true);
     setMobileMenuOpen(false);
   };
 
@@ -281,13 +273,12 @@ export function Header() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Button
-                            onClick={openSelectedTalks}
-                            className="w-full justify-start text-white hover:text-[#02A7A3] hover:bg-teal-50 dark:hover:bg-teal-950/20 h-12 px-4 text-base font-medium rounded-lg"
-                          >
-                            <UserIcon className="h-5 w-5 mr-4" />
-                            Mis Charlas
-                          </Button>
+                          <Link href={`/${user.id}/talks`} key="user-talks">
+                            <Button className="w-full justify-start text-white hover:text-[#02A7A3] hover:bg-teal-50 dark:hover:bg-teal-950/20 h-12 px-4 text-base font-medium rounded-lg">
+                              <UserIcon className="h-5 w-5 mr-4" />
+                              Mis Charlass
+                            </Button>
+                          </Link>
                           <Button
                             onClick={signOut}
                             className="w-full justify-start text-white hover:text-[#EF3B42] hover:bg-red-50 dark:hover:bg-red-950/20 h-12 px-4 text-base font-medium rounded-lg"
@@ -305,10 +296,6 @@ export function Header() {
           </div>
         </div>
       </div>
-      <SelectedTalksSheet
-        isOpen={isSelectedTalksSheetOpen}
-        onClose={() => setIsSelectedTalksSheetOpen(false)}
-      />
     </header>
   );
 }

@@ -12,14 +12,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TRACK_COLORS } from "@/lib/utils";
 import type { Talk } from "@/lib/types";
-import { useSavedTalks } from "@/contexts/saved-talks-context";
+import { saveTalk, unsaveTalk } from "@/lib/actions";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TalkCardProps {
   talk: Talk;
   isSelected?: boolean;
   onToggle?: () => void;
   hideToggle?: boolean;
+  isSaved?: boolean;
 }
 
 export function TalkCard({
@@ -27,11 +29,10 @@ export function TalkCard({
   isSelected = false,
   onToggle,
   hideToggle = false,
+  isSaved = false,
 }: TalkCardProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { isTalkSaved, saveTalk, unsaveTalk } = useSavedTalks();
-
-  const isSaved = isTalkSaved(talk.id);
+  const { toast } = useToast();
 
   const handleSaveTalk = async () => {
     setIsLoading(true);
@@ -39,8 +40,16 @@ export function TalkCard({
     try {
       if (isSaved) {
         await unsaveTalk(talk.id);
+        toast({
+          title: "Charla removida",
+          description: "La charla ha sido removida de tus favoritos",
+        });
       } else {
         await saveTalk(talk.id);
+        toast({
+          title: "Charla guardada",
+          description: "La charla ha sido agregada a tus favoritos",
+        });
       }
 
       // Call the parent onToggle if provided
@@ -49,6 +58,14 @@ export function TalkCard({
       }
     } catch (error) {
       console.error("Error saving talk:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Hubo un problema al guardar la charla",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
